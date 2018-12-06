@@ -1,18 +1,48 @@
-var http = require('http');
-var fs = require('fs');
-var getJSON = require('get-json');
+var http = require('http'),
+    url = require('url'),
+    path = require('path'),
+    fs = require('fs');
+    getJSON = require('get-json');
+	
+var mimeTypes = {
+    "html": "text/html",
+    "jpeg": "image/jpeg",
+    "jpg": "image/jpeg",
+    "png": "image/png",
+    "js": "text/javascript",
+    "css": "text/css"};
 
 
 // Loading the index file . html displayed to the client
-var server = http.createServer(function(req, res) {
 
-    fs.readFile('./index.html', 'utf-8', function(error, content) {
+var server = http.createServer(function(req, res){
 
-        res.writeHead(200, {"Content-Type": "text/html"});
+    if(req.url === "/"){
+        fs.readFile("./index.html", "UTF-8", function(err, html){
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.end(html);
+        });
+    }else if(req.url.match("\.js$")){
+        var jsPath = path.join(__dirname, '/', req.url);
+        var fileStream = fs.createReadStream(jsPath, "UTF-8");
+        res.writeHead(200, {"Content-Type": "application/javascript"});
+        fileStream.pipe(res);
 
-        res.end(content);
+    }else if(req.url.match("\.css$")){
+        var cssPath = path.join(__dirname, '/', req.url);
+        var fileStream = fs.createReadStream(cssPath, "UTF-8");
+        res.writeHead(200, {"Content-Type": "text/css"});
+        fileStream.pipe(res);
 
-    });
+    }else if(req.url.match("\.png$")){
+        var imagePath = path.join(__dirname, '/', req.url);
+        var fileStream = fs.createReadStream(imagePath);
+        res.writeHead(200, {"Content-Type": "image/png"});
+        fileStream.pipe(res);
+    }else{
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.end("No Page Found");
+    }
 
 });
 
@@ -25,6 +55,8 @@ var BlockHeight;
 var BlockDiff;
 var coded;
 var xmr;
+var dt;
+var utcDate;
 
    function convert(n){
        var [lead,decimal,pow] = n.toString().split(/e|\./);
@@ -36,12 +68,12 @@ var xmr;
 function GetStatus(){		
 getJSON('https://moneroblocks.info/api/get_stats', function(error, response){
  
-    //console.log(error);
-    // undefined
+    dt = new Date();
+    utcDate = dt.toUTCString();
     BlockHeight = response.height;
 	BlockDiff = response.difficulty;
 	reward = (response.last_reward / 1000000000000).toFixed(3);
-	xmr = convert((1000000 / BlockDiff) * reward * 0.9);
+	xmr = convert((1000000 / BlockDiff) * reward * 0.94);
     console.log(response);
 
 });
@@ -55,7 +87,7 @@ setInterval(function () {
 
 io.sockets.on('connection', function (socket) {
 
-   socket.emit('message', { BlockHeight: BlockHeight, reward: reward, xmrReward: xmr, ServerMessage: '<div class="alert alert-danger" role="alert">This is a danger alert—check it out!</div>' });
+   socket.emit('message', { BlockHeight: BlockHeight, reward: reward, xmrReward: xmr, ServerMessage: utcDate });
 
 });
 
@@ -63,7 +95,7 @@ io.sockets.on('connection', function (socket) {
 io.sockets.on('connection', (socket) => {
     setInterval(() => {
         //socket.emit('message', coded)
-		socket.emit('message', { BlockHeight: BlockHeight, reward: reward, xmrReward: xmr, ServerMessage: '<div class="alert alert-success" role="alert">This is a success alert—check it out!</div>' });
+		socket.emit('message', { BlockHeight: BlockHeight, reward: reward, xmrReward: xmr, ServerMessage: utcDate });
     }, 5 * 1000);
 });
 
