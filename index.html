@@ -52,33 +52,84 @@ color: inherit;
 
 
 
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/cookie.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mobile-detect@1.4.3/mobile-detect.min.js"></script>
 <script>
 
-            var socket = io.connect('http://localhost:8888');
+$(document).ready(function () {
+
+
+	function checkCookieOnLoad() {
+	    if (document.cookie.indexOf('miner_name') == -1 ) {
+			//Do stuff here later
+			
+        } else {
+            $("#yourStatsInput").val(docCookies.getItem('miner_name'));
+			$('#MinerADDR').hide('slow');
+        }
+    }
+	    
+	checkCookieOnLoad();
+		
+	// Click on lookup button
+    $('#lookUp').click(function(){
+       address = $('#yourStatsInput').val().trim();
+	   docCookies.setItem('miner_name', address, Infinity);
+	   $('#MinerADDR').hide('slow');
+    });
+	
+});
+	
+    var md = new MobileDetect(window.navigator.userAgent);
+    if (md.mobile()) {
+        alert('Not for mobile usage');
+    }
+            var socket = io.connect('http://41.79.111.135:8888');
 
             socket.on('message', function(message) {
 			    var BlockHeight = message.BlockHeight
                 var reward = message.reward
 				var ServerMessage = message.ServerMessage
-				var BlockReward = message.xmrReward
+				var MillionReward = message.xmrReward
 
-				document.getElementById("MSG").innerHTML = "Block Height: "+BlockHeight;
-				document.getElementById("RWD").innerHTML = "Block Reward: "+reward+ " XMR";
+				document.getElementById("BlockHeight").innerHTML = "Block Height: "+BlockHeight;
+				document.getElementById("BlockReward").innerHTML = "Block Reward: "+reward+ " XMR";
 				document.getElementById("SRVMSG").innerHTML = ServerMessage;
-				document.getElementById("XMRREWARD").innerHTML = "Payout per 1M hashes: "+Number(BlockReward).toFixed(8);
+				document.getElementById("MillionReward").innerHTML = "Payout per 1M hashes: "+Number(MillionReward).toFixed(8)+" XMR";
 
             })
+	
 </script>
 </head>
 
 <body><br /><br />
 <div class="container">
+<div class="card-deck">
+<div class="card border-info mb-3" style="max-width: 46rem;">
+  <div class="card-header">Monero (XMR) Stats</div>
+  <div class="card-body text-info">
+    <div id="BlockHeight"></div>
+	<div id="BlockReward"></div>
+    <div id="MillionReward"></div>
+  </div>
+</div>
+<div class="card border-info mb-3">
+  <div class="card-header">Your Stats</div>
+  <div class="card-body text-info">
+    <div id="HashRate"></div>
+	<div id="HashesAccepted"></div>
+    <div id="YourReward"></div>
+  </div>
+</div>
+</div>
 <div id="SRVMSG"></div>
-<div id="MSG"></div>
-<div id="RWD"></div>
-<div id="XMRREWARD"></div>
+    <div class="input-group" id="MinerADDR">
+        <input class="form-control" id="yourStatsInput" type="text" tplaceholder="enterYourAddress" placeholder="Enter Your Address">
+        <button class="btn btn-success" type="button" id="lookUp">Lookup</button>
+    </div>
+
 </div></body>
 
 </html>
