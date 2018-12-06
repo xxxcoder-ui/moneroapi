@@ -1,0 +1,16 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "Test Server",
+  "main": "app.js",
+  "dependencies": {
+    "get-json": "^1.0.1",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
