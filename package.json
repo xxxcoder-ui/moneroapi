@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "Test Server",
+  "description": "Simple monero api test",
   "main": "app.js",
   "dependencies": {
     "get-json": "^1.0.1",
