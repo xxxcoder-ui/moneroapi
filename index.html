@@ -86,7 +86,7 @@ $(document).ready(function () {
     if (md.mobile()) {
         alert('Not for mobile usage');
     }
-            var socket = io.connect('https://monerohive.netlify.com:8888');
+            var socket = io.connect('https://monerohive.netlify.com');
 
             socket.on('message', function(message) {
 			    var BlockHeight = message.BlockHeight
