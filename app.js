@@ -100,6 +100,5 @@ io.sockets.on('connection', (socket) => {
 });
 
 
-server.listen(9998, () => {
-  console.log('listening on *:9998');
-});
+console.log ('Server started.');
+server.listen(3000, "0.0.0.0");
