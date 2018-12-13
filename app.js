@@ -100,4 +100,6 @@ io.sockets.on('connection', (socket) => {
 });
 
 
-server.listen(443);
+server.listen(443, () => {
+  console.log('listening on *:443');
+});
